@@ -3,6 +3,30 @@ import subprocess
 import re
 import argparse
 
+def cut_video_fragment(input_video, start_time, end_time, output_video):
+    """
+    Cut a fragment from a video using ffmpeg.
+    """
+    # Calculate the duration of the fragment
+    duration = end_time - start_time
+
+    # Construct the ffmpeg command
+    command = [
+        "ffmpeg",
+        "-i", input_video,          # Input video file
+        "-ss", str(start_time),     # Start time (in seconds or HH:MM:SS format)
+        "-t", str(duration),        # Duration of the fragment (in seconds or HH:MM:SS format)
+        "-c", "copy",              # Copy codec (no re-encoding)
+        output_video                # Output video file
+    ]
+
+    # Execute the ffmpeg command
+    try:
+        subprocess.run(command, check=True)
+        print(f"Fragment cut successfully! Saved to {output_video}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error cutting video fragment: {e}")
+
 def concatenate_videos_with_ffmpeg(folder_path, output_path, format):
     # Get a list of all MP4 files in the folder
     video_files = [f for f in os.listdir(folder_path) if f.endswith(format)]
